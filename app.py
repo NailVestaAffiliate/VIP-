@@ -15,6 +15,24 @@ NailVesta · 深深达名单生成器
 
 import io
 import re
+import sys
+import subprocess
+import importlib
+
+# --------------------------------------------------------------------------- #
+#  自我修复：若部署环境缺 openpyxl（pandas 读 .xlsx 的引擎），启动时自动安装。
+#  这样即使 Streamlit Cloud 没读到 requirements.txt 也能正常运行。
+# --------------------------------------------------------------------------- #
+def _ensure(pkg, import_name=None):
+    try:
+        importlib.import_module(import_name or pkg)
+    except ImportError:
+        subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", pkg], check=True)
+        importlib.invalidate_caches()
+
+for _p in ("openpyxl", "pandas"):
+    _ensure(_p)
+
 import pandas as pd
 import streamlit as st
 
